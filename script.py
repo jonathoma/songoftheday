@@ -15,7 +15,7 @@ token = util.prompt_for_user_token(username, scope)
 if token:
     sp = spotipy.Spotify(auth=token)
     sp.trace = False
-    results = sp.current_user_top_tracks()
+    results = sp.current_user_top_tracks(time_range='short_term')
     for i, item in enumerate(results['items']):
         print(i, item['name'], '//', item['artists'][0]['name'])
 
