@@ -17,7 +17,7 @@ if token:
     sp.trace = False
     results = sp.current_user_top_tracks(time_range='short_term')
     for i, item in enumerate(results['items']):
-        print(i, item['name'], '//', item['artists'][0]['name'])
+        print(item['artists'][0]['name'], '-', item['name'])
 
 else:
     print("Can't get token for", username)

@@ -1,60 +1,41 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+"""My last.fm."""
+
 import os
-import pylast
-import sys
+from pylast import LastFMNetwork, PERIOD_7DAYS
 
-try:
-    API_KEY = os.environ['LASTFM_API_KEY']
-    API_SECRET = os.environ['LASTFM_API_SECRET']
-except KeyError:
-    API_KEY = "my_api_key"
-    API_SECRET = "my_apy_secret"
+def get_potential_recs(top_tracks):
+    """Get potential recs from top tracks."""
+    potential_recs = {}
+    for top_track in top_tracks:
+        similar_tracks = top_track.item.get_similar()
+        for sim_track in similar_tracks:
+            if sim_track not in potential_recs:
+                potential_recs[sim_track] = 0
+            potential_recs[sim_track] += 1
+    return potential_recs
 
-try:
-    lastfm_username = os.environ['LASTFM_USERNAME']
-    lastfm_password_hash = os.environ['LASTFM_PASSWORD_HASH']
-except KeyError:
-    # In order to perform a write operation you need to authenticate yourself
-    lastfm_username = "my_username"
-    # You can use either use the password, or find the hash once and use that
-    lastfm_password_hash = pylast.md5("my_password")
-    print(lastfm_password_hash)
-    # lastfm_password_hash = "my_password_hash"
 
-lastfm_network = pylast.LastFMNetwork(
-    api_key=API_KEY, api_secret=API_SECRET,
-    username=lastfm_username, password_hash=lastfm_password_hash)
-
-def unicode_track_and_timestamp(track):
-    unicode_track = str(track)
-    return track.playback_date + '\t' + unicode_track
-
-def print_track(track):
-    print(unicode_track_and_timestamp(track))
-
-TRACK_SEPARATOR = u" - "
-
-def split_artist_track(artist_track):
-    artist_track = artist_track.replace(u" – ", " - ")
-    artist_track = artist_track.replace(u"“", "\"")
-    artist_track = artist_track.replace(u"”", "\"")
-
-    (artist, track) = artist_track.split(TRACK_SEPARATOR)
-    artist = artist.strip()
-    track = track.strip()
-    print_it("Artist:\t\t'" + artist + "'")
-    print_it("Track:\t\t'" + track + "'")
-
-    # Validate
-    if len(artist) is 0 and len(track) is 0:
-        sys.exit("Error: Artist and track are blank")
-    if len(artist) is 0:
-        sys.exit("Error: Artist is blank")
-    if len(track) is 0:
-        sys.exit("Error: Track is blank")
-
-    return (artist, track)
-
-# End of file
+if __name__ == '__main__':
+    try:
+        API_KEY = os.environ['LASTFM_API_KEY']
+        API_SECRET = os.environ['LASTFM_API_SECRET']
+        lastfm_username = os.environ['LASTFM_USERNAME']
+        lastfm_password_hash = os.environ['LASTFM_PASSWORD_HASH']
+        lastfm_network = LastFMNetwork(api_key=API_KEY,
+                                       api_secret=API_SECRET,
+                                       username=lastfm_username,
+                                       password_hash=lastfm_password_hash)
+        user = lastfm_network.get_user(lastfm_username)
+        compare_factor = 12
+        top_tracks = user.get_top_tracks(period=PERIOD_7DAYS,
+                                         limit=compare_factor)
+        potential_recs = get_potential_recs(top_tracks)
+        for rec in potential_recs:
+            if potential_recs[rec] > 1:
+                print(rec.item)
+    except KeyError:
+        print("Run setup.sh before trying this!")
+        exit(1)
