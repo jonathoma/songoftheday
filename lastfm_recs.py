@@ -6,6 +6,7 @@
 import os
 from pylast import LastFMNetwork, PERIOD_7DAYS
 
+
 def get_potential_recs(top_tracks):
     """Get potential recs from top tracks."""
     potential_recs = {}
