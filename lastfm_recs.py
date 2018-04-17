@@ -37,12 +37,15 @@ def get_potential_recs(top_tracks):
     return potential_recs
 
 
-if __name__ == '__main__':
+def get_lastfm_recs():
+    """Get LastFM recs."""
     user = authenticate()
-    compare_factor = 12
+    compare_factor = 20
     top_tracks = user.get_top_tracks(period=PERIOD_7DAYS,
                                      limit=compare_factor)
     potential_recs = get_potential_recs(top_tracks)
+    recs = []
     for rec in potential_recs:
         if potential_recs[rec] > 1:
-            print(rec.item)
+            recs.append(rec.item)
+    return recs
