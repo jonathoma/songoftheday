@@ -25,8 +25,11 @@ def authenticate():
     return user
 
 
-def get_potential_recs(top_tracks):
+def get_potential_recs(user):
     """Get potential recs from top tracks."""
+    compare_factor = 20
+    top_tracks = user.get_top_tracks(period=PERIOD_7DAYS,
+                                     limit=compare_factor)
     potential_recs = {}
     for top_track in top_tracks:
         similar_tracks = top_track.item.get_similar()
@@ -37,15 +40,17 @@ def get_potential_recs(top_tracks):
     return potential_recs
 
 
-def get_lastfm_recs():
-    """Get LastFM recs."""
-    user = authenticate()
-    compare_factor = 20
-    top_tracks = user.get_top_tracks(period=PERIOD_7DAYS,
-                                     limit=compare_factor)
-    potential_recs = get_potential_recs(top_tracks)
+def get_recs(potential_recs):
+    """Get recs from potential recs."""
     recs = []
     for rec in potential_recs:
         if potential_recs[rec] > 1:
             recs.append(rec.item)
     return recs
+
+
+def get_lastfm_recs():
+    """Get LastFM recs."""
+    user = authenticate()
+    potential_recs = get_potential_recs(user)
+    return get_recs(potential_recs)
