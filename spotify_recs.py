@@ -26,7 +26,7 @@ def get_potential_recs(sp):
     potential_recs = sp.recommendations(seed_tracks=uris, limit=10)
     recs = []
     for track in potential_recs['tracks']:
-        rec = track['artists'][0]['name'] + '-' + track['name']
+        rec = track['artists'][0]['name'] + ' - ' + track['name']
         recs.append(rec)
     return recs
 
